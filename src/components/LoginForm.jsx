@@ -30,14 +30,12 @@ const LoginForm = () => {
           or <a href="#">create an account</a>
         </span>
         {errors.email || errors.password ? <Alert type="info" validation heading="Form Requirements">
-          <ValidationChecklist id="validate-code">
-            <ValidationItem id="uppercase" isValid={!errors.email}>
-              Email is invalid
-            </ValidationItem>
-            <ValidationItem id="numerical" isValid={!errors.password}>
-              Password is required
-            </ValidationItem>
-          </ValidationChecklist>
+          { errors.email ? <ValidationItem id="uppercase" isValid={!errors.email}>
+            {errors.email?.message}
+          </ValidationItem> : undefined }
+          { errors.password ? <ValidationItem id="numerical" isValid={!errors.password}>
+            {errors.password?.message}
+          </ValidationItem> : undefined }
         </Alert> : undefined}
         <Label htmlFor="email">Email address</Label>
         <TextInput
