@@ -1,8 +1,13 @@
-import { Alert, Button, Fieldset, Form, Label, TextInput, ValidationItem } from '@trussworks/react-uswds';
+// TODO: Remove rule below once appropriate hrefs are added.
+/* eslint-disable jsx-a11y/anchor-is-valid */
+import { useEffect, useRef } from 'react';
+import { Button, Fieldset, Form, Label } from '@trussworks/react-uswds';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import '@trussworks/react-uswds/lib/index.css'
+import classnames from 'classnames';
+import ValidationAlert from './ValidationAlert';
+import './LoginForm.css';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -12,7 +17,9 @@ const validationSchema = Yup.object().shape({
     .required('Password is required')
 });
 
-const onSubmit = data => console.log(data);
+const onSubmit = (data) => {
+  console.log(data);
+};
 
 const LoginForm = () => {
   const {
@@ -22,43 +29,55 @@ const LoginForm = () => {
   } = useForm({
     resolver: yupResolver(validationSchema)
   });
+
+  const alertRef = useRef(null);
+
+  const classNames = classnames(
+    'outline',
+    'usa-input',
+    {
+      'usa-input--error': errors.email || errors.password,
+    }
+  )
+
+  useEffect(() => {
+    alertRef.current?.focus();
+  }, [errors])
   
   return (
-    <div style={{"margin-left": "2em"}}>
+    <div style={{"marginLeft": "2em"}}>
       <Form onSubmit={handleSubmit(onSubmit)} large>
         <Fieldset legend="Sign In" legendStyle="large">
           <legend>
             Access your account
           </legend>
-          {errors.email || errors.password ? <Alert type="info" validation heading="Form Requirements">
-            { errors.email ? <ValidationItem id="uppercase" isValid={!errors.email}>
-              <a href="#email">{errors.email?.message}</a>
-            </ValidationItem> : undefined }
-            { errors.password ? <ValidationItem id="numerical" isValid={!errors.password}>
-              <a href="#password-sign-in">{errors.password?.message}</a>
-            </ValidationItem> : undefined }
-          </Alert> : undefined}
+          <ValidationAlert errors={errors} ref={alertRef} />
           <Label htmlFor="email">Email address</Label>
-          <TextInput
+          <input
             id="email"
             name="email"
             type="text"
             autoCapitalize="off"
             autoCorrect="off"
-            error={errors.email}
+            className={classNames}
+            style={{"outline": "0"}}
             {...register('email')}
           />
-          <small style={{ "color": "red" }}>{errors.email?.message}</small>
+          <div>
+            <small style={{ "color": "red" }}>{errors.email?.message}</small>
+          </div>
           <Label htmlFor="password-sign-in">Password</Label>
           <div>
-            <TextInput
+            <input
               id="password-sign-in"
               name="password-sign-in"
               type="password"
-              error={errors.password}
+              className={classNames}
               {...register('password')}
             />
-            <small style={{ "color": "red" }}>{errors.password?.message}</small>
+            <div>
+              <small style={{ "color": "red" }}>{errors.password?.message}</small>
+            </div>
             <p className="usa-form__note">
               <a
                 title="Show password"
